@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { UserModel } from '../Backend/userBackend/userModel/user.model'
 
+//clave secreta
 const secretKey = process.env.JWT_SECRET
 if (!secretKey) {
   throw new Error("JWT_SECRET is not defined in the environment variables.")
@@ -18,6 +19,7 @@ export interface AuthenticatedRequest extends Request {
   }
 }
 
+// Middleware que autentica al usuario a partir del token JWT
 export const authenticateToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]
@@ -27,16 +29,16 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
   }
 
   try {
-    // Verificar y decodificar el token
+
     const decodedToken = jwt.verify(token, secretKey) as { id: string }
     
-    // Obtener el usuario desde la base de datos
+
     const user = await UserModel.findById(decodedToken.id)
     if (!user || !user.isActive) {
       return res.status(404).json({ message: 'User not found or inactive' })
     }
 
-    // Añadir la información del usuario y permisos al objeto `req.user`
+    // Si todo está bien, agrega los permisos del usuario al objeto `req.user`
     req.user = {
       id: user._id.toString(),
       canCreate: user.canCreate,
@@ -67,8 +69,7 @@ export const checkPermissions = (permissionType: 'canCreate' | 'canDeleteUsers' 
     next()
   }
 }
-//Permisos para editar users, si el usuario intenta modificar su propio perfil, se permite sin permiso especial 
-//Si no es su perfil, verificar el permiso `canEdit`
+// Middleware general para verificar permisos específicos (como crear, editar o eliminar usuarios)
 export const checkEditPermissions = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const userId = req.user?.id
   const targetUserId = req.params.userId
