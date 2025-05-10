@@ -61,6 +61,6 @@ async function DisableUser(request: AuthenticatedRequest, response: Response) {
 userRoutes.get('/login', loginUser)//login 
 userRoutes.post('/', CreateUser)//create user
 userRoutes.put('/:userId',  authenticateToken, checkEditPermissions,UpdateUser)//update user
-userRoutes.put('/:userId', authenticateToken,checkDisablePermissions, DisableUser)//disable user
+userRoutes.delete('/:userId', authenticateToken,checkDisablePermissions, DisableUser)//disable user
 
 export default userRoutes

@@ -6,6 +6,7 @@ import { updateBook } from '../bookController/book.controllers'
 import { disableBook } from '../bookController/book.controllers'
 const bookRoutes = Router()
 
+
 async function CreateBook(request: Request, response: Response) {
   if (!request.body.title || !request.body.author || !request.body.genre || !request.body.publishedDate) {
     return response.status(400).json({ message: 'Missing fields' })
@@ -18,6 +19,7 @@ async function CreateBook(request: Request, response: Response) {
     response.status(500).json({ message: 'Failed to create book', error })
   }
 }
+
 async function GetBooks(request: Request, response: Response) {
   const { bookId } = request.params
   const filters = request.query
@@ -78,6 +80,7 @@ bookRoutes.post('/', authenticateToken, checkPermissions('canCreate'), async (re
     response.status(500).json({ message: 'Failed to create book', error })
   }
 })
+
 bookRoutes.get('/:bookId?', GetBooks) // Búsqueda de un libro específico o con filtros
 bookRoutes.put('/update/:bookId', authenticateToken, checkBookEditPermissions, UpdateBook)//update books
 bookRoutes.put('/disable/:bookId', authenticateToken, checkBookDeletePermissions, DisableBook)//disable books
